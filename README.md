@@ -1,56 +1,57 @@
-Météo France × Metabase Dashboard
+# 🌦️ Météo France x Metabase Dashboard
 
-Tableau de bord météo interactif basé sur les données ouvertes de Météo-France, stockées dans PostgreSQL et visualisées via Metabase.
+## 📌 Project Overview
 
+This project is an interactive weather dashboard built using open data from Météo-France.
 
-Table des matières
+The objective is to analyze weather conditions in France using historical climatological datasets and visualize the results through interactive dashboards created with Metabase.
 
-Aperçu du projet
-Stack technique
-Architecture
-Structure du dépôt
-Sources de données
-Lancer le projet
-Pipeline ETL
-Colonnes du dataset nettoyé
-Connexion Metabase → PostgreSQL
-Notes sur les fichiers de données
-Workflow Git
-Rôle : Data Engineer
-Prochaines étapes
+The project focuses on:
 
+- temperature analysis;
+- rainfall analysis;
+- wind analysis;
+- geographic visualization of weather stations;
+- data storytelling with interactive dashboards.
 
-Aperçu du projet
-Ce projet est un tableau de bord météo interactif construit à partir des données ouvertes de Météo-France.
-L'objectif est d'analyser les conditions météorologiques en France à partir de données climatologiques historiques, puis de visualiser les résultats dans un dashboard Metabase interactif.
-Le projet couvre :
+---
 
-l'analyse des températures
-l'analyse des précipitations
-l'analyse du vent
-la visualisation géographique des stations météo
-le data storytelling via des dashboards interactifs
+# 🛠️ Technical Stack
 
+| Tool | Usage |
+|---|---|
+| Python | Data preprocessing and ETL |
+| PostgreSQL | Weather data storage |
+| Docker | Containerization |
+| Metabase | Interactive dashboard |
+| CSV | Raw Météo-France datasets |
+| GeoJSON | Geographic visualization |
 
-Stack technique
-OutilUsagePythonPrétraitement et ETLPostgreSQLStockage des donnéesDockerConteneurisationMetabaseCréation des dashboardsCSV Météo-FranceSource de données brutesGeoJSONRégions et départements français
+---
 
-Architecture
+# 🏗️ Technical Architecture
+
+```text
 Météo-France CSV
-       ↓
-Scripts ETL Python
-       ↓
-Base de données PostgreSQL
-       ↓
+        ↓
+Python ETL Scripts
+        ↓
+PostgreSQL Database
+        ↓
 Metabase
-       ↓
-Dashboard interactif
+        ↓
+Interactive Dashboard
+```
 
-Structure du dépôt
+---
+
+# 📁 Repository Structure
+
+```text
 meteo-france-metabase/
 ├── data/
-│   ├── raw/                    # Données brutes (non versionnées)
-│   └── clean/                  # Données nettoyées (non versionnées)
+│   ├── raw/
+│   └── clean/
 ├── notebooks/
 │   └── exploration.ipynb
 ├── scripts/
@@ -65,99 +66,266 @@ meteo-france-metabase/
 ├── docker-compose.yml
 ├── README.md
 └── requirements.txt
+```
 
-Sources de données
-Dataset principal
-Données climatologiques journalières issues de Météo-France OpenData :
+---
 
-températures (min, max, moyenne)
-précipitations
-vent
-informations sur les stations météo
+# 📊 Data Sources
 
-Source : https://meteo.data.gouv.fr/
-Fichiers GeoJSON
-Utilisés pour les visualisations géographiques dans Metabase :
+## Main Dataset
 
-Régions : https://france-geojson.gregoiredavid.fr/repo/regions.geojson
-Départements : https://france-geojson.gregoiredavid.fr/repo/departements.geojson
+Daily climatological data from Météo-France OpenData:
 
+- minimum / maximum / average temperatures;
+- rainfall;
+- wind measurements;
+- weather station information.
 
-Lancer le projet
-1. Démarrer les conteneurs Docker
-bashdocker compose up -d
-2. Vérifier les conteneurs actifs
-bashdocker ps
-Conteneurs attendus : meteo_postgres et meteo_metabase
-3. Ouvrir Metabase
+Source:
+
+```text
+https://meteo.data.gouv.fr/
+```
+
+---
+
+## GeoJSON Files
+
+Used for map visualizations in Metabase:
+
+### Regions
+
+```text
+https://france-geojson.gregoiredavid.fr/repo/regions.geojson
+```
+
+### Departments
+
+```text
+https://france-geojson.gregoiredavid.fr/repo/departements.geojson
+```
+
+---
+
+# 🐳 Docker Setup
+
+The project uses Docker Compose with:
+
+- PostgreSQL;
+- Metabase.
+
+## Start containers
+
+```bash
+docker compose up -d
+```
+
+## Verify containers
+
+```bash
+docker ps
+```
+
+Expected containers:
+
+```text
+meteo_postgres
+meteo_metabase
+```
+
+---
+
+# 🌐 Metabase Access
+
+Open Metabase:
+
+```text
 http://localhost:3001
+```
 
-Pipeline ETL
-Le pipeline suit trois étapes : Extract → Clean → Load
-1. Extract
-bashpython scripts/extract_data.py
-2. Clean
-bashpython scripts/clean_data.py
-Opérations effectuées :
+---
 
-sélection des colonnes utiles
-renommage des colonnes
-conversion des valeurs numériques et des dates
-suppression des doublons
-gestion des valeurs manquantes :
+# 🗄️ PostgreSQL Configuration
 
-colonnes de température → remplissage par la moyenne
-colonnes de précipitations et de vent → remplissage par la médiane
+Database connection used in Metabase:
 
+| Parameter | Value |
+|---|---|
+| Host | postgres |
+| Port | 5432 |
+| Database | meteo_db |
+| Username | meteo_user |
+| Password | meteo_password |
 
+⚠️ Important:
 
-3. Load
-bashpython scripts/load_to_postgres.py
-Table PostgreSQL finale : meteo_daily
+Inside Metabase, the host is:
 
-Colonnes du dataset nettoyé
-ColonneDescriptionnum_posteIdentifiant de la station météonom_usuelNom de la station météolatLatitudelonLongitudealtiAltitudeaaaammjjDaterrPrécipitationstnTempérature minimaletxTempérature maximaletmTempérature moyenneffmVitesse moyenne du ventfxyRafale de vent maximale
+```text
+postgres
+```
 
-Connexion Metabase → PostgreSQL
-Lors de la configuration dans Metabase, utiliser les paramètres suivants :
-ParamètreValeurTypePostgreSQLNom d'affichageMeteoDBHôtepostgresPort5432Nom de la basemeteo_dbUtilisateurmeteo_userMot de passemeteo_password
+NOT:
 
-⚠️ Important : à l'intérieur de Metabase, l'hôte est postgres et non localhost.
+```text
+localhost
+```
 
+---
 
-Notes sur les fichiers de données
-Le fichier CSV brut de Météo-France n'est pas versionné sur GitHub car il dépasse la limite de 100 Mo.
-Les dossiers de données sont exclus via .gitignore :
+# ⚙️ ETL Pipeline
+
+The project follows an ETL workflow:
+
+```text
+Extract → Clean → Load
+```
+
+---
+
+## 1️⃣ Extract
+
+```bash
+python scripts/extract_data.py
+```
+
+Handles data extraction.
+
+---
+
+## 2️⃣ Clean
+
+```bash
+python scripts/clean_data.py
+```
+
+Cleaning operations include:
+
+- selecting useful columns;
+- removing duplicates;
+- converting dates;
+- converting numeric values;
+- handling missing values.
+
+### Missing values strategy
+
+| Data Type | Strategy |
+|---|---|
+| Temperature columns | Mean imputation |
+| Rainfall and wind columns | Median imputation |
+
+---
+
+## 3️⃣ Load
+
+```bash
+python scripts/load_to_postgres.py
+```
+
+Loads cleaned data into PostgreSQL.
+
+Final table:
+
+```text
+meteo_daily
+```
+
+---
+
+# 🧹 Cleaned Dataset Columns
+
+```text
+num_poste
+nom_usuel
+lat
+lon
+alti
+aaaammjj
+rr
+tn
+tx
+tm
+ffm
+fxy
+```
+
+---
+
+# 📈 Exploratory Notebook
+
+The notebook:
+
+```text
+notebooks/exploration.ipynb
+```
+
+contains:
+
+- dataset exploration;
+- statistics;
+- missing values analysis;
+- temperature distribution visualization.
+
+---
+
+# 🚫 Large Files
+
+Raw CSV files are not pushed to GitHub because they exceed GitHub's file size limit (100 MB).
+
+Ignored folders:
+
+```text
 data/raw/
 data/clean/
+venv/
+```
 
-Workflow Git
-Le projet utilise une branche dédiée pour les travaux de data engineering :
-bashgit checkout yasmine-setup
-Commandes pour pousser les modifications :
-bashgit add scripts/
+---
+
+# 🔀 Git Workflow
+
+Development branch used:
+
+```text
+yasmine-setup
+```
+
+Useful commands:
+
+```bash
+git add scripts/
 git add README.md
 git add docker-compose.yml
 git add notebooks/
+
 git commit -m "Finalize data engineering pipeline"
+
 git push
+```
 
-Rôle : Data Engineer
-Ce rôle couvre les responsabilités suivantes :
+---
 
-mise en place du dépôt GitHub et de la structure du projet
-configuration de Docker et de PostgreSQL
-connexion de Metabase à PostgreSQL
-nettoyage du dataset Météo-France
-création de la table PostgreSQL meteo_daily
-développement des scripts ETL réutilisables
-documentation technique complète
+# 👩‍💻 Role — Data Engineer
 
+This part of the project was responsible for:
 
-Prochaines étapes
-L'équipe dashboard peut désormais utiliser Metabase pour :
+- GitHub repository setup;
+- Docker configuration;
+- PostgreSQL setup;
+- Metabase connection;
+- ETL pipeline development;
+- dataset cleaning;
+- PostgreSQL table creation;
+- project documentation.
 
-créer des visualisations (températures, précipitations, vent)
-construire des dashboards interactifs avec filtres
-importer les cartes GeoJSON pour les visualisations géographiques
-préparer la démonstration finale du projet
+---
+
+# 🚀 Next Steps
+
+The dashboard team can now:
+
+- create visualizations in Metabase;
+- build dashboards;
+- add filters;
+- import GeoJSON maps;
+- prepare the final presentation.
