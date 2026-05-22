@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: meteo_postgres
+    environment:
+      POSTGRES_USER: meteo_user
+      POSTGRES_PASSWORD: meteo_password
+      POSTGRES_DB: meteo_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  metabase:
+    image: metabase/metabase
+    container_name: meteo_metabase
+    ports:
+      - "3001:3000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
