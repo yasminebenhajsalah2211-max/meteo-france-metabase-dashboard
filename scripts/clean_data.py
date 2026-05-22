@@ -6,15 +6,13 @@ OUTPUT_PATH = "data/clean/clean_meteo.csv"
 
 os.makedirs("data/clean", exist_ok=True)
 
+# Load dataset
 df = pd.read_csv(INPUT_PATH, sep=";", low_memory=False)
 
-# nettoyer noms colonnes
+# Clean column names
 df.columns = df.columns.str.lower().str.strip()
 
-print("Columns:")
-print(df.columns)
-
-# garder colonnes utiles
+# Keep useful columns
 columns_to_keep = [
     "num_poste",
     "nom_usuel",
@@ -30,22 +28,54 @@ columns_to_keep = [
     "fxy"
 ]
 
-available_columns = [col for col in columns_to_keep if col in df.columns]
+df = df[columns_to_keep]
 
-df = df[available_columns]
+# Convert numeric columns
+numeric_cols = [
+    "rr",
+    "tn",
+    "tx",
+    "tm",
+    "ffm",
+    "fxy"
+]
 
-# supprimer doublons
+for col in numeric_cols:
+    df[col] = pd.to_numeric(df[col], errors="coerce")
+
+# Replace missing values
+
+# Temperatures -> mean
+temp_cols = ["tn", "tx", "tm"]
+
+for col in temp_cols:
+    df[col] = df[col].fillna(df[col].mean())
+
+# Rain/Wind -> median
+other_cols = ["rr", "ffm", "fxy"]
+
+for col in other_cols:
+    df[col] = df[col].fillna(df[col].median())
+
+# Remove duplicates
 df = df.drop_duplicates()
 
-# convertir date
-if "date" in df.columns:
-    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+# Convert date
+df["aaaammjj"] = pd.to_datetime(
+    df["aaaammjj"],
+    format="%Y%m%d",
+    errors="coerce"
+)
 
-# supprimer lignes vides
-df = df.dropna(how="all")
+# Remove rows with invalid dates
+df = df.dropna(subset=["aaaammjj"])
 
-# sauvegarde
+# Save clean dataset
 df.to_csv(OUTPUT_PATH, index=False)
 
-print("Clean dataset saved.")
+print("Clean dataset saved successfully.")
 print(df.head())
+
+# Check remaining missing values
+print("\nMissing values:")
+print(df.isnull().sum())
