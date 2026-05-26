@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: meteo_password
       POSTGRES_DB: meteo_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -18,6 +18,10 @@ services:
       - "3001:3000"
     depends_on:
       - postgres
+    environment:
+      MB_DB_FILE: /metabase-data/metabase.db
+    volumes:
+      - ./metabase-data:/metabase-data
 
 volumes:
   postgres_data:

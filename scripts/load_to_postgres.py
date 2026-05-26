@@ -6,7 +6,7 @@ CSV_PATH = "data/clean/clean_meteo.csv"
 DB_USER = "meteo_user"
 DB_PASSWORD = "meteo_password"
 DB_HOST = "localhost"
-DB_PORT = "5432"
+DB_PORT = "5433"
 DB_NAME = "meteo_db"
 
 engine = create_engine(
